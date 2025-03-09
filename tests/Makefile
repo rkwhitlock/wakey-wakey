@@ -1,9 +1,9 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -pthread
 TARGET = sudoku
-SRCS = main.c sudoku.c keypad.c joystick.c
+SRCS = main.c sudoku.c
 OBJS = $(SRCS:.c=.o)
-FLAGS = -lwiringPi -lncurses
+FLAGS = -lncurses
 
 all: $(TARGET)
 

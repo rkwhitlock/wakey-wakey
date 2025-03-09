@@ -3,7 +3,6 @@
 #define JOYSTICK_H
 
 #include "shared.h"
-#include <wiringPi.h>
 
 #define SPI_CHANNEL 0
 #define SPI_SPEED 1000000

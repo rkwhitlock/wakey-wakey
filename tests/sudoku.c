@@ -48,7 +48,7 @@ void display_board(SharedVariable *v)
             for (int j = 0; j < 3; j++)
             {
                 // If this box matches the cursor position, use the highlighted color
-                if (i == cursor_y && j == cursor_x)
+                if (i == v->cursor_y && j == v->cursor_x)
                 {
                     attron(COLOR_PAIR(2)); // Apply the highlight color pair (Yellow background)
                 }
@@ -72,7 +72,7 @@ void display_board(SharedVariable *v)
                 }
 
                 // Turn off highlighting if this was the highlighted box
-                if (i == cursor_y && j == cursor_x)
+                if (i == v->cursor_y && j == v->cursor_x)
                 {
                     attroff(COLOR_PAIR(2)); // Remove highlight color
                 }

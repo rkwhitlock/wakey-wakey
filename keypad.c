@@ -79,13 +79,13 @@ void *body_keypad(SharedVariable *v)
 
             if (key >= '1' && key <= '3') // Only allow numbers 1-3 for 3x3 grid
             {
-                grid[cursor_y][cursor_x] = key - '0';
-                printf("Keypad Pressed: %c at (%d, %d)\n", key, cursor_y, cursor_x);
+                v->grid[v->cursor_y][v->cursor_x] = key - '0';
+                printf("Keypad Pressed: %c at (%d, %d)\n", key, v->cursor_y, v->cursor_x);
             }
             else if (key == '*') // Clear cell
             {
-                grid[cursor_y][cursor_x] = 0;
-                printf("Cell Cleared at (%d, %d)\n", cursor_y, cursor_x);
+                v->grid[v->cursor_y][v->cursor_x] = 0;
+                printf("Cell Cleared at (%d, %d)\n", v->cursor_y, v->cursor_x);
             }
 
             pthread_mutex_unlock(&v->lock);

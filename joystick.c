@@ -8,7 +8,6 @@
 
 #define DEADZONE 100 // Deadzone threshold for joystick movement
 
-extern int cursor_x, cursor_y;
 extern pthread_mutex_t board_lock;
 
 int readADC(int channel)
@@ -25,7 +24,6 @@ int readADC(int channel)
 
 void *body_joystick(SharedVariable *v)
 {
-
     if (wiringPiSPISetup(SPI_CHANNEL, SPI_SPEED) == -1)
     {
         printf("SPI setup failed!\n");
@@ -43,22 +41,22 @@ void *body_joystick(SharedVariable *v)
 
         pthread_mutex_lock(&v->lock);
 
-        if (joyX < (512 - DEADZONE) && cursor_x > 0)
+        if (joyX < (512 - DEADZONE) && v->cursor_x > 0)
         {
-            cursor_x--;
+            v->cursor_x--;
         }
-        else if (joyX > (512 + DEADZONE) && cursor_x < SIZE - 1)
+        else if (joyX > (512 + DEADZONE) && v->cursor_x < SIZE - 1)
         {
-            cursor_x++;
+            v->cursor_x++;
         }
 
-        if (joyY < (512 - DEADZONE) && cursor_y > 0)
+        if (joyY < (512 - DEADZONE) && v->cursor_y > 0)
         {
-            cursor_y--;
+            v->cursor_y--;
         }
-        else if (joyY > (512 + DEADZONE) && cursor_y < SIZE - 1)
+        else if (joyY > (512 + DEADZONE) && v->cursor_y < SIZE - 1)
         {
-            cursor_y++;
+            v->cursor_y++;
         }
 
         pthread_mutex_unlock(&v->lock);
