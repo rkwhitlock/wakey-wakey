@@ -10,10 +10,11 @@ extern pthread_mutex_t board_lock;
 
 typedef struct
 {
-    int exit_flag;
+    int sudoku_flag;
     pthread_mutex_t lock;
     int grid[SIZE][SIZE];
     int cursor_x, cursor_y;
+    int locked[SIZE][SIZE];
 } SharedVariable;
 
 #endif

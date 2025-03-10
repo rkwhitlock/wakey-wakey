@@ -3,66 +3,70 @@
 #include <stdio.h>
 #include <wiringPi.h>
 
-int rowPins[ROWS] = {1, 4, 5, 6};
-int colPins[COLS] = {26, 27, 28, 29};
-char keys[ROWS][COLS] = {
-    {'1', '2', '3', 'A'}, {'4', '5', '6', 'B'}, {'7', '8', '9', 'C'}, {'*', '0', '#', 'D'}};
-
-// Function to initialize the keypad GPIOs
 void setupKeypad()
 {
 
-    // Set row pins as OUTPUT and initialize LOW
-    for (int i = 0; i < 4; i++)
-    {
-        pinMode(rowPins[i], OUTPUT);
-        digitalWrite(rowPins[i], LOW); // Start with rows LOW
-    }
+    pinMode(ROW_PIN, OUTPUT);
+    digitalWrite(ROW_PIN, LOW);
 
-    // Set column pins as INPUT with pull-down resistors
-    for (int i = 0; i < 4; i++)
-    {
-        pinMode(colPins[i], INPUT);
-        pullUpDnControl(colPins[i], PUD_DOWN); // Apply pull-down
-    }
+    pinMode(PIN_ONE, INPUT);
+    pullUpDnControl(PIN_ONE, PUD_DOWN);
+    pinMode(PIN_TWO, INPUT);
+    pullUpDnControl(PIN_TWO, PUD_DOWN);
+    pinMode(PIN_THREE, INPUT);
+    pullUpDnControl(PIN_THREE, PUD_DOWN);
 }
 
-// Function to scan for key presses
-char getKeyPress()
+int getKeyPress()
 {
-    for (int row = 0; row < 4; row++)
+    digitalWrite(ROW_PIN, HIGH);
+
+    if (digitalRead(PIN_ONE) == HIGH)
     {
-        // Set all rows LOW before scanning
-        for (int r = 0; r < 4; r++)
+        delay(100);
+
+        if (digitalRead(PIN_ONE) == HIGH)
         {
-            digitalWrite(rowPins[r], LOW);
+
+            while (digitalRead(PIN_ONE) == HIGH)
+                ;
+
+            digitalWrite(ROW_PIN, LOW);
+            return 1;
         }
-
-        digitalWrite(rowPins[row], HIGH); // Activate one row
-
-        for (int col = 0; col < 4; col++)
-        {
-            if (digitalRead(colPins[col]) == HIGH)
-            {               // Key detected
-                delay(100); // Increased debounce delay for stability
-
-                // Confirm keypress after debounce
-                if (digitalRead(colPins[col]) == HIGH)
-                {
-                    printf("Detected key at ROW: %d, COL: %d\n", row, col);
-
-                    // Wait for key release
-                    while (digitalRead(colPins[col]) == HIGH)
-                        ;
-
-                    digitalWrite(rowPins[row], LOW); // Reset row LOW
-                    return keys[row][col];           // Return correct key
-                }
-            }
-        }
-        digitalWrite(rowPins[row], LOW); // Reset row LOW before next scan
     }
-    return 0; // No key pressed
+
+    if (digitalRead(PIN_TWO) == HIGH)
+    {
+        delay(100);
+
+        if (digitalRead(PIN_TWO) == HIGH)
+        {
+            while (digitalRead(PIN_TWO) == HIGH)
+                ;
+
+            digitalWrite(ROW_PIN, LOW);
+            return 2;
+        }
+    }
+
+    if (digitalRead(PIN_THREE) == HIGH)
+    {
+        delay(100);
+
+        if (digitalRead(PIN_THREE) == HIGH)
+        {
+            while (digitalRead(PIN_THREE) == HIGH)
+                ;
+
+            digitalWrite(ROW_PIN, LOW);
+            return 3;
+        }
+    }
+
+    digitalWrite(ROW_PIN, LOW);
+
+    return 0;
 }
 
 void *body_keypad(SharedVariable *v)
@@ -70,26 +74,20 @@ void *body_keypad(SharedVariable *v)
 
     setupKeypad();
 
-    while (!v->exit_flag)
+    while (!v->sudoku_flag)
     {
-        char key = getKeyPress();
+        int key = getKeyPress();
         if (key)
         {
             pthread_mutex_lock(&v->lock);
 
-            if (key >= '1' && key <= '3') // Only allow numbers 1-3 for 3x3 grid
+            if (key >= 1 && key <= 3 && !v->locked[v->cursor_y][v->cursor_x])
             {
-                v->grid[v->cursor_y][v->cursor_x] = key - '0';
-                printf("Keypad Pressed: %c at (%d, %d)\n", key, v->cursor_y, v->cursor_x);
-            }
-            else if (key == '*') // Clear cell
-            {
-                v->grid[v->cursor_y][v->cursor_x] = 0;
-                printf("Cell Cleared at (%d, %d)\n", v->cursor_y, v->cursor_x);
+                v->grid[v->cursor_y][v->cursor_x] = key;
             }
 
             pthread_mutex_unlock(&v->lock);
-            delay(200); // Debounce delay
+            delay(200);
         }
     }
 

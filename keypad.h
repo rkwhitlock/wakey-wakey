@@ -5,15 +5,15 @@
 #include "shared.h"
 #include <wiringPi.h>
 
-#define ROWS 4
-#define COLS 4
+#define SIZE 3
 
-extern int rowPins[ROWS];
-extern int colPins[COLS];
-extern char keys[ROWS][COLS];
+#define PIN_ONE 26
+#define PIN_TWO 27
+#define PIN_THREE 28
+#define ROW_PIN 1
 
 void setupKeypad();
-char getKeyPress();
+int getKeyPress();
 void *body_keypad(SharedVariable *v);
 
 #endif

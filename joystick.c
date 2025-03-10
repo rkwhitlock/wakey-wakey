@@ -6,8 +6,6 @@
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
 
-#define DEADZONE 100 // Deadzone threshold for joystick movement
-
 extern pthread_mutex_t board_lock;
 
 int readADC(int channel)
@@ -33,7 +31,7 @@ void *body_joystick(SharedVariable *v)
     pinMode(JOY_BTN_PIN, INPUT);
     pullUpDnControl(JOY_BTN_PIN, PUD_UP);
 
-    while (!v->exit_flag)
+    while (!v->sudoku_flag)
     {
         int joyX = readADC(JOY_X_CH);
         int joyY = readADC(JOY_Y_CH);
@@ -61,9 +59,9 @@ void *body_joystick(SharedVariable *v)
 
         pthread_mutex_unlock(&v->lock);
 
-        if (buttonState == LOW)
+        if (buttonState == LOW && !v->locked[v->cursor_y][v->cursor_x])
         {
-            printf("Joystick Button Pressed!\n");
+            v->grid[v->cursor_y][v->cursor_x] = 0;
         }
 
         delay(200);

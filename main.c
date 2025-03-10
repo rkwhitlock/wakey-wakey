@@ -1,5 +1,6 @@
 #include "joystick.h"
 #include "keypad.h"
+#include "pose.h"
 #include "sudoku.h"
 #include <pthread.h>
 #include <stdio.h>
@@ -8,13 +9,22 @@
 int cursor_x = 0, cursor_y = 0;
 pthread_mutex_t board_lock;
 
-int main(int argc, char *argv[])
+int main()
 {
     SharedVariable v;
-    v.exit_flag = 0;
+    v.sudoku_flag = 0;
     pthread_mutex_init(&v.lock, NULL);
     v.cursor_x = cursor_x;
     v.cursor_y = cursor_y;
+
+    printf("hello\n");
+
+    int cnt = 0;
+
+    while (!check_pose() && cnt < 10)
+    {
+        cnt++;
+    }
 
     for (int i = 0; i < SIZE; i++)
     {
@@ -28,6 +38,7 @@ int main(int argc, char *argv[])
             {
                 v.grid[i][j] = j - i + 1;
             }
+            v.locked[i][j] = 1;
         }
     }
 
@@ -43,16 +54,8 @@ int main(int argc, char *argv[])
     pthread_create(&t_joystick, NULL, body_joystick, &v);
     pthread_create(&t_keypad, NULL, body_keypad, &v);
 
-    printf("Press 'D' on the keypad to quit.\n");
-    while (!v.exit_flag)
+    while (!v.sudoku_flag)
     {
-        char key = getKeyPress();
-        if (key == 'D')
-        {
-            v.exit_flag = 1;
-            printf("Quit command received from keypad.\n");
-            break;
-        }
         delay(100);
     }
 
@@ -62,7 +65,7 @@ int main(int argc, char *argv[])
 
     pthread_mutex_destroy(&v.lock);
 
-    printf("Program finished.\n");
+    printf("Congratulations!! You solved it.\n");
 
     return 0;
 }

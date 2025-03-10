@@ -11,6 +11,8 @@
 #define JOY_X_CH 0
 #define JOY_Y_CH 1
 
+#define DEADZONE 100 // Deadzone threshold for joystick movement
+
 int readADC(int channel);
 void *body_joystick(SharedVariable *v);
 

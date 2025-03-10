@@ -14,84 +14,91 @@ void scramble(SharedVariable *v)
         int x = rand() % SIZE;
         int y = rand() % SIZE;
         v->grid[x][y] = 0;
+        v->locked[x][y] = 0;
     }
     pthread_mutex_destroy(&v->lock);
 }
 
-void display_board(SharedVariable *v)
+int check_win(SharedVariable *v)
 {
-    pthread_mutex_init(&v->lock, NULL);
-    clear();
-
-    // Initialize ncurses
-    initscr();
-    start_color();                           // Start color functionality
-    init_pair(1, COLOR_WHITE, COLOR_BLUE);   // Color pair for normal numbers
-    init_pair(2, COLOR_BLACK, COLOR_YELLOW); // Color pair for highlighted number
+    int row_check[SIZE], col_check[SIZE], box_check[SIZE];
 
     for (int i = 0; i < SIZE; i++)
     {
+        memset(row_check, 0, sizeof(row_check));
+        memset(col_check, 0, sizeof(col_check));
 
-        const char *numbers[] = {ZERO, ONE, TWO, THREE};
-
-        // Array to hold concatenated output for each row
-        char result[1024] = ""; // Buffer to store the concatenated result
-        char temp[1024];        // Temporary buffer for concatenation
-
-        // We have 11 rows in each number's ASCII art, so loop over them
-        for (int row = 0; row < 11; row++)
+        for (int j = 0; j < SIZE; j++)
         {
-            // Clear the temporary buffer for the current row
-            temp[0] = '\0';
+            // Check row
+            if (v->grid[i][j] < 1 || v->grid[i][j] > SIZE)
+                return 0; // Invalid number found
+            if (row_check[v->grid[i][j] - 1] == 1)
+                return 0; // Duplicate number in row
+            row_check[v->grid[i][j] - 1] = 1;
 
-            // Loop over each number and append its current row to temp
-            for (int j = 0; j < 3; j++)
-            {
-                // If this box matches the cursor position, use the highlighted color
-                if (i == cursor_y && j == cursor_x)
-                {
-                    attron(COLOR_PAIR(2)); // Apply the highlight color pair (Yellow background)
-                }
-                else
-                {
-                    attron(
-                        COLOR_PAIR(1)); // Apply the normal color pair (White text, Blue background)
-                }
-
-                if (i == v->cursor_y && j == v->cursor_x)
-                {
-                    attron(A_REVERSE);
-                }
-                // Extract the row for the current number (i) and concatenate it
-                const char *line_start =
-                    numbers[v->grid[i][j]] + row * 20; // Each row has 17 characters
-                strncat(temp, line_start, 20);         // Append the current line to temp
-                if (i == v->cursor_y && j == v->cursor_x)
-                {
-                    attroff(A_REVERSE);
-                }
-
-                // Turn off highlighting if this was the highlighted box
-                if (i == cursor_y && j == cursor_x)
-                {
-                    attroff(COLOR_PAIR(2)); // Remove highlight color
-                }
-                else
-                {
-                    attroff(COLOR_PAIR(1)); // Remove normal color
-                }
-            }
-
-            // After processing all numbers, append the current row to the result
-            strcat(result, temp);
-            strcat(result, "\n");
+            // Check column
+            if (col_check[v->grid[j][i] - 1] == 1)
+                return 0; // Duplicate number in column
+            col_check[v->grid[j][i] - 1] = 1;
         }
+    }
 
-        printw("%s", result);
+    return 1; // Sudoku is solved
+}
+
+void display_board(SharedVariable *v)
+{
+    clear();
+    // Initialize ncurses
+    initscr();
+    start_color(); // Start color functionality
+    use_default_colors();
+    init_pair(1, COLOR_BLACK, -1);
+    init_pair(2, COLOR_MAGENTA, -1);
+
+    printw("Solve the Sudoku puzzle!! Press the joystick button to clear a cell.\n");
+    for (int i = 0; i < SIZE; i++)
+    {
+        for (int j = 0; j < SIZE; j++)
+        {
+            if (i == v->cursor_y && j == v->cursor_x)
+            {
+                attron(A_REVERSE);
+            }
+            if (v->locked[i][j])
+            {
+                attron(COLOR_PAIR(2));
+            }
+            else
+            {
+                attron(COLOR_PAIR(1));
+            }
+            if (v->grid[i][j] == 0)
+            {
+                printw(".");
+            }
+            else
+            {
+                printw("%d", v->grid[i][j]);
+            }
+            if (i == v->cursor_y && j == v->cursor_x)
+            {
+                attroff(A_REVERSE);
+            }
+            if (v->locked[i][j])
+            {
+                attroff(COLOR_PAIR(2));
+            }
+            else
+            {
+                attroff(COLOR_PAIR(1));
+            }
+            printw(" ");
+        }
         printw("\n");
     }
     refresh();
-    pthread_mutex_destroy(&v->lock);
 }
 
 void body_sudoku(SharedVariable *v)
@@ -104,10 +111,14 @@ void body_sudoku(SharedVariable *v)
     scramble(v);
     display_board(v);
 
-    while (!v->exit_flag)
+    while (!v->sudoku_flag)
     {
         pthread_mutex_lock(&v->lock);
         display_board(v);
+        if (check_win(v))
+        {
+            v->sudoku_flag = 1;
+        }
         pthread_mutex_unlock(&v->lock);
         napms(100); // Slow down display refresh
     }

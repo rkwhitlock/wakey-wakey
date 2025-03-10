@@ -58,6 +58,7 @@
     " '----------------' "
 
 void scramble();
+int check_win(SharedVariable *v);
 void display_board();
 void body_sudoku(SharedVariable *v);
 
