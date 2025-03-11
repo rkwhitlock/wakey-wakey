@@ -5,7 +5,7 @@ SRCS = main.c sudoku.c keypad.c joystick.c pose.c
 OBJS = $(SRCS:.c=.o)
 FLAGS = -lwiringPi -lncurses
 
-all: $(TARGET) capture motor
+all: $(TARGET) capture motor rtc
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(FLAGS)
@@ -15,6 +15,9 @@ capture: capture.o
 
 motor: stepper_motor.c
 	$(CC) $(CFLAGS) -o motor stepper_motor.c $(FLAGS)
+
+rtc: rtc.c
+	$(CC) $(CFLAGS) -o rtc rtc.c $(FLAGS)
 
 
 clean:
