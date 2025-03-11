@@ -15,6 +15,7 @@ typedef struct
     int grid[SIZE][SIZE];
     int cursor_x, cursor_y;
     int locked[SIZE][SIZE];
+    int alarm;
 } SharedVariable;
 
 #endif

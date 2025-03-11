@@ -101,6 +101,26 @@ void display_board(SharedVariable *v)
     refresh();
 }
 
+void sudoku_init(SharedVariable *v)
+{
+
+    for (int i = 0; i < SIZE; i++)
+    {
+        for (int j = 0; j < SIZE; j++)
+        {
+            if (i > j)
+            {
+                v->grid[i][j] = SIZE - i + j + 1;
+            }
+            else
+            {
+                v->grid[i][j] = j - i + 1;
+            }
+            v->locked[i][j] = 1;
+        }
+    }
+}
+
 void body_sudoku(SharedVariable *v)
 {
     initscr();
@@ -108,6 +128,7 @@ void body_sudoku(SharedVariable *v)
     curs_set(0);
     pthread_mutex_init(&v->lock, NULL);
 
+    sudoku_init(v);
     scramble(v);
     display_board(v);
 

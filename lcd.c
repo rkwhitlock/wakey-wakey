@@ -6,12 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <wiringPi.h>
-#define LCD_RS 7
-#define LCD_E 21
-#define LCD_D4 22
-#define LCD_D5 23
-#define LCD_D6 24
-#define LCD_D7 25
 
 void pulseEnable()
 {
@@ -94,15 +88,10 @@ void lcd_init()
     delay(3);
 }
 
-int main(int argc, char *argv[])
+void display(char *s, char byte)
 {
-    lcd_init();
-
+    SetCmdMode();
+    lcd_byte(byte);
     SetChrMode();
-    if (argc > 1)
-        lcd_text(argv[1]);
-    else
-        lcd_text("Hello World!");
-
-    return 0;
+    lcd_text(s);
 }

@@ -3,7 +3,6 @@
 #define KEYPAD_H
 
 #include "shared.h"
-#include <wiringPi.h>
 
 #define SIZE 3
 
