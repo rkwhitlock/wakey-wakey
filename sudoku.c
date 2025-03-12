@@ -143,6 +143,7 @@ void body_sudoku(SharedVariable *v)
         pthread_mutex_unlock(&v->lock);
         napms(100); // Slow down display refresh
     }
+    clear();
 
     pthread_mutex_destroy(&v->lock);
     endwin();

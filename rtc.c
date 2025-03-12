@@ -68,6 +68,6 @@ void body_rtc(SharedVariable *v)
             v->alarm = 1;
         }
 
-        sleep(60); // Check time every minute
+        sleep(30); // Check time every minute
     }
 }
