@@ -1,3 +1,4 @@
+#include "rtc.h"
 #include "lcd.h"
 #include "shared.h"
 #include <pthread.h>
@@ -17,7 +18,7 @@ void body_rtc(SharedVariable *v)
     if (fd == -1)
     {
         fprintf(stderr, "Failed to initialize I2C communication.\n");
-        return 1;
+        return;
     }
     printf("DS3231 RTC Initialized\n");
     lcd_init();
@@ -55,8 +56,8 @@ void body_rtc(SharedVariable *v)
 
         snprintf(time_str, sizeof(time_str), "%02d:%02d", adjusted_time->tm_hour,
                  adjusted_time->tm_min);
-        snprintf(date_str, sizeof(date_str), "%02d/%02d/%04d", adjusted_time->tm_mon,
-                 adjusted_time->tm_mday, adjusted_time->tm_year);
+        snprintf(date_str, sizeof(date_str), "%02d/%02d/%04d", adjusted_time->tm_mon + 1,
+                 adjusted_time->tm_mday, adjusted_time->tm_year + 1900);
 
         display(time_str, 0x80);
         display(date_str, 0xC0);

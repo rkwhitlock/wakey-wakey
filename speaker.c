@@ -53,6 +53,12 @@ void body_speaker(SharedVariable *v)
     sleep(2);
 
     // Play the audio file after the connection is made
-    playAudio("mixkit-crickets-and-insects-in-the-wild-ambience-39.mp3"); // Update this with your
-                                                                          // audio file
+    while (1)
+    {
+        if (v->alarm)
+        {
+            playAudio("rooster.mp3");
+        }
+        delay(4);
+    }
 }

@@ -6,10 +6,10 @@
 
 #define SIZE 3
 
-#define PIN_ONE 26
-#define PIN_TWO 27
-#define PIN_THREE 28
-#define ROW_PIN 1
+#define PIN_ONE 27
+#define PIN_TWO 28
+#define PIN_THREE 29
+#define ROW_PIN 26
 
 void setupKeypad();
 int getKeyPress();

@@ -3,6 +3,7 @@
  *	  Simple program to send a string to the LCD
  */
 
+#include "lcd.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <wiringPi.h>

@@ -54,7 +54,7 @@ void display_board(SharedVariable *v)
     initscr();
     start_color(); // Start color functionality
     use_default_colors();
-    init_pair(1, COLOR_BLACK, -1);
+    init_pair(1, COLOR_BLUE, -1);
     init_pair(2, COLOR_MAGENTA, -1);
 
     printw("Solve the Sudoku puzzle!! Press the joystick button to clear a cell.\n");

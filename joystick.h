@@ -7,7 +7,7 @@
 
 #define SPI_CHANNEL 0
 #define SPI_SPEED 1000000
-#define JOY_BTN_PIN 3
+#define JOY_BTN_PIN 4
 #define JOY_X_CH 0
 #define JOY_Y_CH 1
 

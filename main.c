@@ -1,7 +1,9 @@
 #include "joystick.h"
 #include "keypad.h"
+#include "motor.h"
 #include "pose.h"
 #include "rtc.h"
+#include "speaker.h"
 #include "sudoku.h"
 #include <pthread.h>
 #include <stdio.h>
@@ -19,7 +21,7 @@ int main()
         return 1;
     }
 
-    pthread_t t_sudoku, t_joystick, t_keypad, t_rtc;
+    pthread_t t_sudoku, t_joystick, t_keypad, t_rtc, t_speaker, t_motor;
 
     SharedVariable v;
     v.sudoku_flag = 0;
@@ -29,6 +31,8 @@ int main()
     v.alarm = 0;
 
     pthread_create(&t_rtc, NULL, body_rtc, &v);
+    pthread_create(&t_speaker, NULL, body_speaker, &v);
+    pthread_create(&t_motor, NULL, body_motor, &v);
 
     while (!v.alarm)
     {
@@ -40,7 +44,10 @@ int main()
     while (!check_pose() && cnt < 10)
     {
         cnt++;
+        printf("COUNT: %d", cnt);
     }
+
+    v.alarm = 0;
 
     pthread_create(&t_sudoku, NULL, body_sudoku, &v);
     pthread_create(&t_joystick, NULL, body_joystick, &v);
@@ -55,8 +62,12 @@ int main()
     pthread_join(t_joystick, NULL);
     pthread_join(t_keypad, NULL);
     pthread_join(t_rtc, NULL);
+    pthread_join(t_speaker, NULL);
+    pthread_join(t_motor, NULL);
 
     pthread_mutex_destroy(&v.lock);
+
+    clear();
 
     printf("Congratulations!! You solved it.\n");
 

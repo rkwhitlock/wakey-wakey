@@ -25,7 +25,7 @@ int check_pose()
         {
             if (strcmp(result, "1\n") == 0)
             {
-                printf("SUCCESS\n");
+                printf("SUCCESS: %s\n", result);
                 return 1;
             }
             else
@@ -43,5 +43,6 @@ int check_pose()
         printf("error :(");
         return 0;
     }
+
     return 0;
 }

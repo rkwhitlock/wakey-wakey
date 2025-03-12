@@ -29,10 +29,7 @@ if results.pose_landmarks:
     left_shoulder_y = landmarks[LEFT_SHOULDER].y
     right_shoulder_y = landmarks[RIGHT_SHOULDER].y
 
-    if left_wrist_y > left_shoulder_y and right_wrist_y > right_shoulder_y:
+    if left_wrist_y < left_shoulder_y and right_wrist_y < right_shoulder_y:
         print(1)
 
 print(0)
-
-
-
