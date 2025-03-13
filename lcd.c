@@ -10,15 +10,15 @@
 
 void pulseEnable()
 {
+    // Pulses the enable pin to signal the LCD to read the data pins
+
     digitalWrite(LCD_E, HIGH);
-    delayMicroseconds(1); // Enable pulse must be > 450ns
+    delayMicroseconds(1);
     digitalWrite(LCD_E, LOW);
-    delayMicroseconds(50); // Command delay
+    delayMicroseconds(50);
 }
 
-/*
-  Send a byte to the LCD in two nibbles
-*/
+// Send byte to LCD
 void lcd_byte(char bits)
 {
     // Send higher nibble
@@ -36,27 +36,27 @@ void lcd_byte(char bits)
     pulseEnable();
 }
 
-void SetCmdMode()
-{
-    digitalWrite(LCD_RS, LOW); // Set for commands
-}
+void SetCmdMode() { digitalWrite(LCD_RS, LOW); }
 
-void SetChrMode()
-{
-    digitalWrite(LCD_RS, HIGH); // Set for characters
-}
+void SetChrMode() { digitalWrite(LCD_RS, HIGH); }
 
 void lcd_text(char *s)
 {
+    // Write each character of string
     while (*s)
-        lcd_byte(*s++);
+    {
+        lcd_byte(*s);
+
+        // Increment s to move to next character
+        s++;
+    }
 }
 
 void lcd_init()
 {
-    wiringPiSetup(); // Use BCM numbering
+    wiringPiSetup();
 
-    // Ensure LCD pins are set as OUTPUT
+    // Set pins as output and write LOW default values
     pinMode(LCD_E, OUTPUT);
     pinMode(LCD_RS, OUTPUT);
     pinMode(LCD_D4, OUTPUT);
@@ -91,8 +91,11 @@ void lcd_init()
 
 void display(char *s, char byte)
 {
+    // Set the position of where to write the string
     SetCmdMode();
     lcd_byte(byte);
+
+    // Write the string
     SetChrMode();
     lcd_text(s);
 }

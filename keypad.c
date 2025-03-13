@@ -5,10 +5,12 @@
 
 void setupKeypad()
 {
-
+    // Set row pin as output to send voltage to the row
     pinMode(ROW_PIN, OUTPUT);
     digitalWrite(ROW_PIN, LOW);
 
+    // Set column pins as input
+    // There is only one row so these are also just keypad numbers
     pinMode(PIN_ONE, INPUT);
     pullUpDnControl(PIN_ONE, PUD_DOWN);
     pinMode(PIN_TWO, INPUT);
@@ -19,53 +21,39 @@ void setupKeypad()
 
 int getKeyPress()
 {
+    // Activate the row
     digitalWrite(ROW_PIN, HIGH);
 
-    if (digitalRead(PIN_ONE) == HIGH)
+    int pins[3] = {PIN_ONE, PIN_TWO, PIN_THREE};
+
+    for (int i = 0; i < 3; i++)
     {
-        delay(100);
-
-        if (digitalRead(PIN_ONE) == HIGH)
+        // Check if key is pressed
+        if (digitalRead(pins[i]) == HIGH)
         {
+            // Debounce delay
+            delay(100);
 
-            while (digitalRead(PIN_ONE) == HIGH)
-                ;
+            // Confirm button still pressed
+            if (digitalRead(pins[i]) == HIGH)
+            {
 
-            digitalWrite(ROW_PIN, LOW);
-            return 1;
-        }
-    }
+                // Wait for button releaase
+                while (digitalRead(pins[i]) == HIGH)
+                    ;
 
-    if (digitalRead(PIN_TWO) == HIGH)
-    {
-        delay(100);
+                // Deactivate row
+                digitalWrite(ROW_PIN, LOW);
 
-        if (digitalRead(PIN_TWO) == HIGH)
-        {
-            while (digitalRead(PIN_TWO) == HIGH)
-                ;
-
-            digitalWrite(ROW_PIN, LOW);
-            return 2;
-        }
-    }
-
-    if (digitalRead(PIN_THREE) == HIGH)
-    {
-        delay(100);
-
-        if (digitalRead(PIN_THREE) == HIGH)
-        {
-            while (digitalRead(PIN_THREE) == HIGH)
-                ;
-
-            digitalWrite(ROW_PIN, LOW);
-            return 3;
+                // Return number pressed
+                return (i + 1);
+            }
         }
     }
 
     digitalWrite(ROW_PIN, LOW);
 
+    // If no key pressed return 0
     return 0;
 }
 
@@ -74,21 +62,26 @@ void *body_keypad(SharedVariable *v)
 
     setupKeypad();
 
+    // While sudoku is not solved
     while (!v->sudoku_flag)
     {
         int key = getKeyPress();
+
+        // If a key is pressed
         if (key)
         {
             pthread_mutex_lock(&v->lock);
 
+            // Writes key to grid
             if (key >= 1 && key <= 3 && !v->locked[v->cursor_y][v->cursor_x])
             {
                 v->grid[v->cursor_y][v->cursor_x] = key;
             }
 
             pthread_mutex_unlock(&v->lock);
-            delay(200);
         }
+
+        delay(200);
     }
 
     pthread_exit(NULL);

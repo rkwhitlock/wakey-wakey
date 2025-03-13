@@ -6,18 +6,21 @@
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
 
-extern pthread_mutex_t board_lock;
-
 int readADC(int channel)
 {
     uint8_t buffer[3];
-    buffer[0] = 1;                  // Start bit
-    buffer[1] = (8 + channel) << 4; // Single-ended mode
+
+    // Start bit (1)
+    buffer[0] = 1;
+
+    // Single-ended mode (1) & channel selection
+    buffer[1] = (8 + channel) << 4;
+
     buffer[2] = 0;
 
     wiringPiSPIDataRW(SPI_CHANNEL, buffer, 3);
 
-    return ((buffer[1] & 3) << 8) + buffer[2]; // 10-bit ADC value (0-1023)
+    return ((buffer[1] & 3) << 8) + buffer[2];
 }
 
 void *body_joystick(SharedVariable *v)
@@ -31,6 +34,7 @@ void *body_joystick(SharedVariable *v)
     pinMode(JOY_BTN_PIN, INPUT);
     pullUpDnControl(JOY_BTN_PIN, PUD_UP);
 
+    // Runs until sudoku is solved
     while (!v->sudoku_flag)
     {
         int joyX = readADC(JOY_X_CH);
@@ -39,26 +43,28 @@ void *body_joystick(SharedVariable *v)
 
         pthread_mutex_lock(&v->lock);
 
-        if (joyX < (512 - DEADZONE) && v->cursor_x > 0)
+        // Adjust cursor x and y values based on joystick
+        if (joyX < (CENTER - DEADZONE) && v->cursor_x > 0)
         {
             v->cursor_x--;
         }
-        else if (joyX > (512 + DEADZONE) && v->cursor_x < SIZE - 1)
+        else if (joyX > (CENTER + DEADZONE) && v->cursor_x < SIZE - 1)
         {
             v->cursor_x++;
         }
 
-        if (joyY < (512 - DEADZONE) && v->cursor_y > 0)
+        if (joyY < (CENTER - DEADZONE) && v->cursor_y > 0)
         {
             v->cursor_y--;
         }
-        else if (joyY > (512 + DEADZONE) && v->cursor_y < SIZE - 1)
+        else if (joyY > (CENTER + DEADZONE) && v->cursor_y < SIZE - 1)
         {
             v->cursor_y++;
         }
 
         pthread_mutex_unlock(&v->lock);
 
+        // Clears sudoku cell if joystick button is pressed
         if (buttonState == LOW && !v->locked[v->cursor_y][v->cursor_x])
         {
             v->grid[v->cursor_y][v->cursor_x] = 0;
