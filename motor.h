@@ -11,8 +11,8 @@
 #define IN3 2 // GPIO 27
 #define IN4 3 // GPIO 22
 
-void stepMotor(int step);
-void rotate(int steps, int delayMs);
-void body_motor(SharedVariable *v);
+void stepMotor(int step);            // move the motor by step
+void rotate(int steps, int delayMs); // rotate the motor
+void body_motor(SharedVariable *v);  //  motor handler
 
 #endif

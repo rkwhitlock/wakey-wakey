@@ -1,5 +1,5 @@
 // rtc.h
-
+// Real Time Clock (RTC) interface
 #ifndef RTC_H
 #define RTC_H
 
@@ -9,7 +9,7 @@
 #define ALARM_HOUR 16 // Set alarm hour (24-hour format)
 #define ALARM_MIN 59  // Set alarm minute
 
-int bcdToDec(int val);
-void body_rtc(SharedVariable *v);
+int bcdToDec(int val);            // Convert binary to decimal
+void body_rtc(SharedVariable *v); // RTC handler
 
 #endif

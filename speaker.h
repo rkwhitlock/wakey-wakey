@@ -5,10 +5,10 @@
 
 #include "shared.h"
 
-#define SPEAKER_MAC "37:4D:21:9B:D9:87"
+#define SPEAKER_MAC "37:4D:21:9B:D9:87" // MAC address of the Bluetooth speaker
 
-void connectBluetoothSpeaker();
-void playAudio(const char *filePath);
-void body_speaker(SharedVariable *v);
+void connectBluetoothSpeaker();       // Connect to bluetooth speaker
+void playAudio(const char *filePath); // Play audio file
+void body_speaker(SharedVariable *v); // Speaker handler
 
 #endif

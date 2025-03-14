@@ -1,3 +1,7 @@
+/*
+ * keypad.c:
+ *	  Simple program to read a 4x4 keypad matrix
+ */
 #include "keypad.h"
 #include "shared.h"
 #include <stdio.h>

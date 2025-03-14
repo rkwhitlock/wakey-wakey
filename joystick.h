@@ -1,4 +1,6 @@
-/**
+/*
+ * joystick.h
+ *
  * Sources:
  *
  * ChatGPT (OpenAI): Assisted in generating readADC() SPI channel reads
